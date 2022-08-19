@@ -11,11 +11,11 @@ class Credentials
     }
 
     async getHashPassword(){
-        return bcrypt.hash(this.password,10);
+        return bcrypt.hash(this.password,10)
     }
 
     static findusername(userName){
-        for (let index = 0; index < Credentials.allCredentials.length; index++) {
+        for (let index = 0; index < Credentials.allCredentials.length; index++){
             if(Credentials.allCredentials[index].userName == userName){
                 return [true,index]
             }

@@ -2,6 +2,7 @@ const Contact = require('./contact.js')
 const ContactDetails = require('./contactdetails.js')
 const Credentials = require('./credentials.js')
 const uuid = require('uuid')
+const bcrypt = require('bcrypt');
 
 class User{
 
@@ -16,18 +17,25 @@ class User{
         this.contacts = []
     }
     
-  
+    async comparePassword(password)
+    {
+        let isPasswordMatch = await bcrypt.compare(password,this.credential.password)
+        return isPasswordMatch;
+    }
+
+    
 
     static findUser(userName){
         for (let index = 0; index < User.allUsers.length; index++) {
-            if(User.allUsers[index].credential.userName== userName){
+            if(User.allUsers[index].credential.userName == userName){
                 return [true,User.allUsers[index].isActive,index]
             }
         }
         return [false,false,-1]
     }
+
     findContact(fullName){
-        for (let index = 0; index < this.contacts.length; index++) {
+        for (let index = 0; index < this.contacts.length; index++){
             const contact = this.contacts[index];
             if(contact.fullName == fullName){
                 return [true,contact.isActive,index]
@@ -56,9 +64,10 @@ class User{
         if(!message){
             return [false,"Contact doesn't  Exist !!!"]
         }
-        let newContactDetil = this.contacts[indexOfContact].createContactDetail(type,value)
+       
+            let [newContactDetil,text] = this.contacts[indexOfContact].createContactDetail(type,value)
 
-        return [newContactDetil,"detail Added successfully"]
+             return [newContactDetil,text]
     }
 
     deleteContact(fullName){
@@ -73,9 +82,10 @@ class User{
         return [result,"deleted "]
     }
 
-    static createAdmin(){
+    static async createAdmin(){
       
-        let credential = Credentials.createCredential('GR123','GR@2000');
+        let credential = Credentials.createCredential('GR123','GR@2000')
+        credential.password = await credential.getHashPassword();
         let newUser = new User('George','Russell',credential,'admin')
         User.allUsers.push(newUser)
         return [newUser,"Admin Created"]
@@ -87,11 +97,9 @@ class User{
         }
         let [message,isactive,index] = User.findUser(userName)
         if(message){
-            return ["User already exists!!!"]
+            return [false,"User already exists!!!"]
         }
-        if(isactive){
-            return
-        }
+       
         const credential = Credentials.createCredential(userName,password);
         credential.password = await credential.getHashPassword();
         let newUser = new User(firstName,lastName,credential,role)

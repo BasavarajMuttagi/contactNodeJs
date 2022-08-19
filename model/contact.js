@@ -26,12 +26,17 @@ class Contact{
             return false
         }
 
-        this.contactDetails.forEach(eachDetail => {
-            if(type == eachDetail.type){
+        // this.contactDetails.forEach(eachDetail => {
+        //     if(type == eachDetail.type){
+        //         return [false,"Type exists!!!"]
+        //     }
+        // });
+        for (let index = 0; index < this.contactDetails.length; index++) {
+            if(this.contactDetails[index].type == type){
                 return [false,"Type exists!!!"]
             }
-        });
-
+            
+        }
         let newContactDetail = new ContactDetail(type,value)
         this.contactDetails.push(newContactDetail)
         return [true,newContactDetail]
